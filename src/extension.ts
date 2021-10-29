@@ -2,67 +2,96 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 
-import * as cp from "child_process";
 
-const execShell = (cmd: string) =>
-  new Promise<string>((resolve, reject) => {
-	cp.exec(cmd, (err, stdout, stderr) => {
-	  if (err) {
-		//return resolve(cmd + ' error!');
-		return resolve(stderr);
-	  }
-	  return resolve(stdout);
-	});
-  });
+let rootPath: string;
+let sdkPath: string;
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
 
-	const channel = vscode.window.createOutputChannel('MadMachine');
-	const terminal = vscode.window.createTerminal('MadMachine');
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "madmachine" is now active!');
 
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	let disposable = vscode.commands.registerCommand('madmachine.helloWorld', () => {
-		// The code you place here will be executed every time your command is executed
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World from madmachine!');
-	});
-	context.subscriptions.push(disposable);
+	sdkPath = getSettings();
+	const workspaceFolders = vscode.workspace.workspaceFolders;
+	if (workspaceFolders) {
+		rootPath = workspaceFolders[0].uri.path;
+	}
 
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
+
 	let buildCommand = vscode.commands.registerCommand('madmachine.build', async () => {
-
-		//channel.clear();
-		//channel.show();
-		//const output = await execShell('python3 /Users/andy/swift-project/mm-sdk/mm/src/mm.py build');
-		//const output = await execShell('pwd');
-		//channel.append(output);	
-		console.log('madmachine build')
-		terminal.sendText('python3 /Users/andy/swift-project/mm-sdk/mm/src/mm.py build');
-		//terminal.dispose();
-
+		console.log('madmachine build');
+		const cmd = 'python3 ' + sdkPath + '/mm/src/mm.py build';
+		madmachineExec(cmd);
 	});
 	context.subscriptions.push(buildCommand);
 
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
+
 	let downloadCommand = vscode.commands.registerCommand('madmachine.download', () => {
-		// The code you place here will be executed every time your command is executed
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Download from madmachine!');
+		console.log('madmachine download');
+		const cmd = 'python3 ' + sdkPath + '/mm/src/mm.py download';
+		madmachineExec(cmd);
 	});
 	context.subscriptions.push(downloadCommand);
 
+	let newCommand = vscode.commands.registerCommand('madmachine.new', () => {
+		console.log('madmachine new project');
+		const cmd = 'python3 ' + sdkPath + '/mm/src/mm.py download';
+	});
+	context.subscriptions.push(newCommand);
+
+	let openCommand = vscode.commands.registerCommand('madmachine.open', async () => {
+		console.log('madmachine open project');
+		await vscode.commands.executeCommand('vscode.openFolder');
+	});
+	context.subscriptions.push(openCommand);
 }
 
 // this method is called when your extension is deactivated
 export function deactivate() {}
+
+function getMadMachineTerminal(): vscode.Terminal {
+	const terminals = <vscode.Terminal[]>(<any>vscode.window).terminals;
+
+	const terminal = terminals.find(t => 
+		t.name === 'MadMachine'
+	);
+
+	if (terminal === undefined) {
+		return vscode.window.createTerminal('MadMachine');
+	}
+
+	return terminal;
+}
+
+
+function madmachineExec(cmd: string) {
+	const terminals = <vscode.Terminal[]>(<any>vscode.window).terminals;
+
+	let terminal = terminals.find(t => 
+		t.name === 'MadMachine'
+	);
+
+	if (terminal === undefined) {
+		terminal = vscode.window.createTerminal('MadMachine');
+	} else {
+		terminal.sendText('cd ' + rootPath);
+	}
+
+	terminal.sendText('clear');
+	terminal.sendText(cmd);
+	terminal.show();
+}
+
+function getSettings(): string {
+	const platform = process.platform;
+	const workspaceSettings = vscode.workspace.getConfiguration('madmachine');
+	let path: string = '';
+
+	if (platform === 'darwin')	{
+		path = workspaceSettings.sdk.mac;
+	} else if (platform === 'linux') {
+		path = workspaceSettings.sdk.linux;
+	}
+
+	return path;
+}

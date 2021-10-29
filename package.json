@@ -3,6 +3,7 @@
 	"displayName": "madmachine",
 	"description": "",
 	"version": "0.0.1",
+	"publisher": "madmachineio",
 	"engines": {
 		"vscode": "^1.61.0"
 	},
@@ -10,14 +11,32 @@
 		"Other"
 	],
 	"activationEvents": [
-		"*"
+		"workspaceContains:**/Package.mmp",
+		"onView:madmachine"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
+		"configuration": {
+				"title": "MadMachine",
+				"properties": {
+					"madmachine.sdk.mac": {
+						"type": "string",
+						"description": "The mm-sdk path"
+					},
+					"madmachine.sdk.linux": {
+						"type": "string",
+						"description": "The mm-sdk path"
+					}
+				}
+		},
 		"commands": [
 			{
-				"command": "madmachine.helloWorld",
-				"title": "Hello World"
+				"command": "madmachine.build",
+				"title": "MadMachine: Build"
+			},
+			{
+				"command": "madmachine.download",
+				"title": "MadMachine: Download"
 			}
 		],
 		"views": {
@@ -31,7 +50,7 @@
 		"viewsWelcome": [
 			{
 				"view": "madmachine",
-				"contents": "\n[Build](command:madmachine.build)\n[Download](command:madmachine.download)"
+				"contents": "\n[Build](command:madmachine.build)\n[Download](command:madmachine.download)\n[New Project](command:madmachine.new)\n[Open Project](command:madmachine.open)"
 			}
 		]
 	},
