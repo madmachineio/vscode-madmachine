@@ -1,6 +1,6 @@
 {
   "name": "madmachine",
-	"displayName": "vscode-madmachine",
+	"displayName": "madmachine",
 	"description": "",
 	"version": "0.0.1",
 	"engines": {
@@ -10,7 +10,7 @@
 		"Other"
 	],
 	"activationEvents": [
-        "onCommand:madmachine.helloWorld"
+		"*"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
@@ -18,6 +18,20 @@
 			{
 				"command": "madmachine.helloWorld",
 				"title": "Hello World"
+			}
+		],
+		"views": {
+			"explorer": [
+				{
+					"id": "madmachine",
+					"name": "MadMachine"
+				}
+			]
+		},
+		"viewsWelcome": [
+			{
+				"view": "madmachine",
+				"contents": "\n[Build](command:madmachine.build)\n[Download](command:madmachine.download)"
 			}
 		]
 	},
