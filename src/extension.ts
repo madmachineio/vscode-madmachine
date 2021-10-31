@@ -3,31 +3,23 @@
 import * as vscode from 'vscode';
 
 
-let rootPath: string;
-let sdkPath: string;
-
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
 
 
-	sdkPath = getSettings();
-	const workspaceFolders = vscode.workspace.workspaceFolders;
-	if (workspaceFolders) {
-		rootPath = workspaceFolders[0].uri.path;
-	}
-
-
 	let buildCommand = vscode.commands.registerCommand('madmachine.build', async () => {
 		console.log('madmachine build');
+		const sdkPath = getSdkPath();
 		const cmd = 'python3 ' + sdkPath + '/mm/src/mm.py build';
 		madmachineExec(cmd);
 	});
 	context.subscriptions.push(buildCommand);
 
 
-	let downloadCommand = vscode.commands.registerCommand('madmachine.download', () => {
+	let downloadCommand = vscode.commands.registerCommand('madmachine.download', async () => {
 		console.log('madmachine download');
+		const sdkPath = getSdkPath();
 		const cmd = 'python3 ' + sdkPath + '/mm/src/mm.py download';
 		madmachineExec(cmd);
 	});
@@ -35,6 +27,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	let newCommand = vscode.commands.registerCommand('madmachine.new', () => {
 		console.log('madmachine new project');
+		const sdkPath = getSdkPath();
 		const cmd = 'python3 ' + sdkPath + '/mm/src/mm.py download';
 	});
 	context.subscriptions.push(newCommand);
@@ -74,6 +67,7 @@ function madmachineExec(cmd: string) {
 	if (terminal === undefined) {
 		terminal = vscode.window.createTerminal('MadMachine');
 	} else {
+		const rootPath = getRootPath();
 		terminal.sendText('cd ' + rootPath);
 	}
 
@@ -82,7 +76,7 @@ function madmachineExec(cmd: string) {
 	terminal.show();
 }
 
-function getSettings(): string {
+function getSdkPath(): string {
 	const platform = process.platform;
 	const workspaceSettings = vscode.workspace.getConfiguration('madmachine');
 	let path: string = '';
@@ -94,4 +88,14 @@ function getSettings(): string {
 	}
 
 	return path;
+}
+
+function getRootPath(): string {
+
+	const workspaceFolders = vscode.workspace.workspaceFolders;
+	if (workspaceFolders) {
+		return workspaceFolders[0].uri.path;
+	} else {
+		return '';
+	}
 }
