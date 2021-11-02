@@ -7,9 +7,9 @@ import * as vscode from 'vscode';
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
 
-
 	let buildCommand = vscode.commands.registerCommand('madmachine.build', async () => {
 		console.log('madmachine build');
+		vscode.workspace.saveAll();
 		const sdkPath = getSdkPath();
 		const cmd = 'python3 ' + sdkPath + '/mm/src/mm.py build';
 		madmachineExec(cmd);
@@ -31,12 +31,6 @@ export function activate(context: vscode.ExtensionContext) {
 		const cmd = 'python3 ' + sdkPath + '/mm/src/mm.py download';
 	});
 	context.subscriptions.push(newCommand);
-
-	let openCommand = vscode.commands.registerCommand('madmachine.open', async () => {
-		console.log('madmachine open project');
-		await vscode.commands.executeCommand('vscode.openFolder');
-	});
-	context.subscriptions.push(openCommand);
 }
 
 // this method is called when your extension is deactivated
@@ -91,7 +85,6 @@ function getSdkPath(): string {
 }
 
 function getRootPath(): string {
-
 	const workspaceFolders = vscode.workspace.workspaceFolders;
 	if (workspaceFolders) {
 		return workspaceFolders[0].uri.path;

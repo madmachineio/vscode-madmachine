@@ -21,11 +21,11 @@
 				"properties": {
 					"madmachine.sdk.mac": {
 						"type": "string",
-						"description": "Specify the MadMachine SDK path on your macOS"
+						"description": "Specify the MadMachine SDK path on macOS"
 					},
 					"madmachine.sdk.linux": {
 						"type": "string",
-						"description": "Specify the MadMachine SDK path on your Linux"
+						"description": "Specify the MadMachine SDK path on Linux"
 					}
 				}
 		},
@@ -50,7 +50,7 @@
 		"viewsWelcome": [
 			{
 				"view": "madmachine",
-				"contents": "\n[Build](command:madmachine.build)\n[Download](command:madmachine.download)\n[New Project](command:madmachine.new)\n[Open Project](command:madmachine.open)"
+				"contents": "\n[Build](command:madmachine.build)\n[Download](command:madmachine.download)\n[New Project](command:madmachine.new)"
 			}
 		]
 	},
