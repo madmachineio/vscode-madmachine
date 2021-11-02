@@ -1,9 +1,9 @@
 {
   "name": "madmachine",
-	"displayName": "madmachine",
-	"description": "",
-	"version": "0.0.1",
-	"publisher": "madmachineio",
+	"displayName": "MadMachine",
+	"description": "MadMachine for Visual Studio Code",
+	"version": "0.0.2",
+	"publisher": "MadMachine",
 	"engines": {
 		"vscode": "^1.61.0"
 	},
@@ -11,8 +11,8 @@
 		"Other"
 	],
 	"activationEvents": [
-		"workspaceContains:**/Package.mmp",
-		"onView:madmachine"
+		"onView:madmachine",
+		"workspaceContains:**/Package.mmp"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
@@ -21,11 +21,11 @@
 				"properties": {
 					"madmachine.sdk.mac": {
 						"type": "string",
-						"description": "The mm-sdk path"
+						"description": "Specify the MadMachine SDK path on your macOS"
 					},
 					"madmachine.sdk.linux": {
 						"type": "string",
-						"description": "The mm-sdk path"
+						"description": "Specify the MadMachine SDK path on your Linux"
 					}
 				}
 		},
@@ -74,5 +74,9 @@
 		"mocha": "^9.1.1",
 		"typescript": "^4.4.3",
 		"@vscode/test-electron": "^1.6.2"
-	}
+	},
+	"extensionPack": [
+		"hancel.serialport-helper",
+		"tamasfe.even-better-toml"
+	]
 }
