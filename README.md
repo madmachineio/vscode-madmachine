@@ -1,43 +1,30 @@
 # MadMachine For Visual Studio Code
 
-
 ## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+This extension simplifies the procedure of developing MadMachine project.
 
-For example if there is an image subfolder under your extension project workspace:
-
-\!\[feature X\]\(images/feature-x.png\)
-
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
 
 ## Requirements
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+This extension is used with [MadMachine SDK](https://github.com/madmachineio/mm-sdk/releases)
 
 ## Extension Settings
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
-
-For example:
-
 This extension contributes the following settings:
 
-* `myExtension.enable`: enable/disable this extension
-* `myExtension.thing`: set to `blah` to do something
+* `madmachine.sdk.mac`: The MadMachine SDK path on macOS
+* `madmachine.sdk.linux`: The MadMachine SDK path on Linux
 
 ## Known Issues
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+
 
 ## Release Notes
 
-Users appreciate release notes as you update your extension.
+
 
 ### 0.0.2
 
-Fixed issue #.
-
-### 0.0.1
-
-Inital
+Initial commit
+Compatible with MadMachine SDK 0.5.0 or newer

@@ -37,6 +37,10 @@
 			{
 				"command": "madmachine.download",
 				"title": "MadMachine: Download"
+			},
+			{
+				"command": "madmachine.new",
+				"title": "MadMachine: New Project"
 			}
 		],
 		"views": {
