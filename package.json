@@ -81,7 +81,6 @@
 		"@vscode/test-electron": "^1.6.2"
 	},
 	"extensionPack": [
-		"hancel.serialport-helper",
-		"tamasfe.even-better-toml"
+		"hancel.serialport-helper"
 	]
 }
