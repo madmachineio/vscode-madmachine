@@ -35,6 +35,7 @@ export function activate(context: vscode.ExtensionContext) {
 		const cmd = 'python3 ' + sdkPath + '/mm/src/mm.py init';
 
 		const projectType = await projectTypePick();
+		console.log(projectType)
 		if (!projectType) {
 			throw vscode.CancellationError;
 		}
@@ -57,12 +58,12 @@ export function activate(context: vscode.ExtensionContext) {
 		}).then( uris => {
 			if (uris) {
 				const projectPath = vscode.Uri.joinPath(uris[0], projectName).fsPath;
+				console.log(projectPath);
 				cp.execSync('mkdir ' + projectPath);
 				cp.execSync('cd ' + projectPath + '; ' +
 						cmd + ' -b ' + boardName + ' -t ' + projectType);
 
 				vscode.commands.executeCommand('vscode.openFolder', vscode.Uri.parse(projectPath), true);
-
 			}
 		});
 	});
