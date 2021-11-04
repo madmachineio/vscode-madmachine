@@ -5,6 +5,7 @@
 	"icon": "images/logo.png",
 	"version": "0.0.2",
 	"homepage": "https://madmachine.io",
+	"license": "MIT",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/madmachineio/vscode-madmachine.git"
