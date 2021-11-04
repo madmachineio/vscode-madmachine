@@ -5,17 +5,19 @@ import * as fs from 'fs';
 import * as cp from "child_process";
 
 
-
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
-	getSdkPath();
+	if (!checkSdkVersion('0.5.0')) {
+		vscode.window.showErrorMessage('Please update the MadMachine SDK');
+		throw vscode.CancellationError;
+	}
 
 	let buildCommand = vscode.commands.registerCommand('madmachine.build', async () => {
 		console.log('madmachine build');
 		vscode.workspace.saveAll();
 		const sdkPath = getSdkPath();
-		const cmd = 'python3 ' + sdkPath + '/mm/src/mm.py build';
+		const cmd = sdkPath + '/usr/mm/mm build';
 		terminalExec(cmd);
 	});
 	context.subscriptions.push(buildCommand);
@@ -24,7 +26,7 @@ export function activate(context: vscode.ExtensionContext) {
 	let downloadCommand = vscode.commands.registerCommand('madmachine.download', async () => {
 		console.log('madmachine download');
 		const sdkPath = getSdkPath();
-		const cmd = 'python3 ' + sdkPath + '/mm/src/mm.py download';
+		const cmd = sdkPath + '/usr/mm/mm download';
 		terminalExec(cmd);
 	});
 	context.subscriptions.push(downloadCommand);
@@ -32,10 +34,10 @@ export function activate(context: vscode.ExtensionContext) {
 	let newCommand = vscode.commands.registerCommand('madmachine.new', async () => {
 		console.log('madmachine new project');
 		const sdkPath = getSdkPath();
-		const cmd = 'python3 ' + sdkPath + '/mm/src/mm.py init';
+		const cmd = sdkPath + '/usr/mm/mm init';
 
 		const projectType = await projectTypePick();
-		console.log(projectType)
+		console.log(projectType);
 		if (!projectType) {
 			throw vscode.CancellationError;
 		}
@@ -59,6 +61,10 @@ export function activate(context: vscode.ExtensionContext) {
 			if (uris) {
 				const projectPath = vscode.Uri.joinPath(uris[0], projectName).fsPath;
 				console.log(projectPath);
+				if (fs.existsSync(projectPath)) {
+					vscode.window.showErrorMessage(projectPath + ' already exists');
+					throw vscode.FileSystemError.FileExists(projectPath);
+				}
 				cp.execSync('mkdir ' + projectPath);
 				cp.execSync('cd ' + projectPath + '; ' +
 						cmd + ' -b ' + boardName + ' -t ' + projectType);
@@ -112,6 +118,38 @@ function getSdkPath(): string {
 	}
 	return sdkUri.fsPath;
 }
+
+function checkSdkVersion(support: string): boolean {
+	const sdkPath = getSdkPath();
+	const cmd = sdkPath + '/usr/mm/mm --version';
+
+	const current = cp.execSync(cmd).toString().trim();
+	console.log(current);
+
+	const supportVersion = support.split('.');
+	const currentVersion = current.split('.');
+	const count = supportVersion.length;
+
+	console.log(supportVersion);
+	console.log(currentVersion);
+	console.log(count);
+
+	for (let i = 0; i < count; i++) {
+		let currenNum = Number(currentVersion[i]);
+		let supportNum = Number(supportVersion[i]);
+
+		if ((i === 0 || i === 1) && currenNum !== supportNum) {
+			return false;
+		}
+
+		if (i === 2 && currenNum < supportNum) {
+			return false;
+		}
+	}
+
+	return true;
+}
+
 
 function getRootPath(): string {
 	const workspaceFolders = vscode.workspace.workspaceFolders;
