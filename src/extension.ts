@@ -108,7 +108,8 @@ function getSdkPath(): string {
 	} else if (platform === 'linux') {
 		sdkPath = workspaceSettings.sdk.linux;
 	} else {
-		sdkPath = '';
+		vscode.window.showErrorMessage('Only support macOS and Linux currently');
+		throw vscode.CancellationError;
 	}
 
 	const sdkUri = vscode.Uri.parse(sdkPath);
