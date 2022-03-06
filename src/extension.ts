@@ -8,17 +8,85 @@ import * as cp from "child_process";
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
-	if (!checkSdkVersion('0.5.0')) {
-		vscode.window.showErrorMessage('Please update the MadMachine SDK');
-		throw vscode.CancellationError;
-	}
+	// if (!checkSdkVersion('0.5.0')) {
+	// 	vscode.window.showErrorMessage('Please update the MadMachine SDK');
+	// 	throw vscode.CancellationError;
+	// }
+
+	// let buildCommand = vscode.commands.registerCommand('madmachine.build', async () => {
+	// 	console.log('madmachine build');
+	// 	vscode.workspace.saveAll();
+	// 	const sdkPath = getSdkPath();
+	// 	const cmd = sdkPath + '/usr/mm/mm build';
+	// 	terminalExec(cmd);
+	// });
+	// context.subscriptions.push(buildCommand);
 
 	let buildCommand = vscode.commands.registerCommand('madmachine.build', async () => {
 		console.log('madmachine build');
 		vscode.workspace.saveAll();
-		const sdkPath = getSdkPath();
-		const cmd = sdkPath + '/usr/mm/mm build';
-		terminalExec(cmd);
+
+		if(vscode.workspace.workspaceFolders !== undefined) {
+			let wf = vscode.workspace.workspaceFolders[0].uri.path ;
+			let f = vscode.workspace.workspaceFolders[0].uri.fsPath ; 
+		
+			let message = `YOUR-EXTENSION: folder: ${wf} - ${f}` ;
+	
+			console.log(message);
+			vscode.window.showInformationMessage(message);
+			const cmd = 'sudo docker run -it --rm -v /home/andy/Documents/Blink:/home/Blink acde2bff6e2a';
+			console.log(cmd);
+
+			
+
+
+
+
+			const terminals = <vscode.Terminal[]>(<any>vscode.window).terminals;
+
+			let terminal = terminals.find(t => 
+				t.name === 'MadMachine'
+			);
+		
+			if (!terminal) {
+				terminal = vscode.window.createTerminal('MadMachine');
+			} else {
+				terminal.sendText('clear');
+			}
+		
+			terminal.sendText(cmd);
+			terminal.sendText('andy');
+			terminal.sendText('cd /home/Blink');
+			terminal.sendText('/home/mm-sdk/usr/mm/mm build');
+			terminal.sendText('exit');
+			terminal.show();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		} else {
+			let message = "YOUR-EXTENSION: Working folder not found, open a folder an try again" ;
+		
+			vscode.window.showErrorMessage(message);
+		}
+
+
+
+
+
+		//const cmd = sdkPath + '/usr/mm/mm build';
+		//terminalExec(cmd);
 	});
 	context.subscriptions.push(buildCommand);
 
