@@ -24,7 +24,7 @@ This extension contributes the following settings:
 
 
 
-### 0.0.2
+### 0.0.3
 
 Initial commit
-Compatible with MadMachine SDK 0.5.0 or newer
+Compatible with MadMachine SDK 0.7.0 or newer
