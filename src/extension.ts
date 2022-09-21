@@ -42,10 +42,13 @@ export function activate(context: vscode.ExtensionContext) {
 			throw vscode.CancellationError;
 		}
 
-		const boardName = await boardPick();
-		console.log(boardName);
-		if (!boardName) {
-			throw vscode.CancellationError;
+		var boardName: string
+		if (projectType == 'executable') {
+			boardName = await boardPick();
+			console.log(boardName);
+			if (!boardName) {
+				throw vscode.CancellationError;
+			}
 		}
 
 		const projectName = await projectNameInput();
@@ -66,8 +69,17 @@ export function activate(context: vscode.ExtensionContext) {
 					throw vscode.FileSystemError.FileExists(projectPath);
 				}
 				cp.execSync('mkdir ' + projectPath);
-				cp.execSync('cd ' + projectPath + '; ' +
-						cmd + ' -b ' + boardName + ' -t ' + projectType);
+
+				var newCommand;
+				if (projectType == 'executable') {
+					newCommand = ('cd ' + projectPath + '; ' +
+					cmd + ' -b ' + boardName + ' -t ' + projectType);
+				} else {
+					newCommand = ('cd ' + projectPath + '; ' +
+					cmd + ' -t ' + projectType);
+				}
+
+				cp.execSync(newCommand);
 
 				vscode.commands.executeCommand('vscode.openFolder', vscode.Uri.parse(projectPath), true);
 			}
@@ -171,14 +183,14 @@ async function projectTypePick() {
 	const result = await vscode.window.showQuickPick(['executable', 'library'], {
 		placeHolder: 'Choose the project type',
 	});
-    return result;
+    return <string>result;
 }
 
 async function boardPick() {
 	const result = await vscode.window.showQuickPick(['SwiftIOFeather', 'SwiftIOBoard'], {
 		placeHolder: 'Choose the board, you could change it in the Packae.mmp later',
 	});
-    return result;
+    return <string>result;
 }
 
 async function projectNameInput() {
