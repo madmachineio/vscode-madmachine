@@ -70,7 +70,7 @@ export function activate(context: vscode.ExtensionContext) {
 				}
 				cp.execSync('mkdir ' + projectPath);
 
-				var newCommand;
+				var newCommand: string
 				if (projectType == 'executable') {
 					newCommand = ('cd ' + projectPath + '; ' +
 					cmd + ' -b ' + boardName + ' -t ' + projectType);
