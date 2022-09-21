@@ -3,7 +3,7 @@
 	"displayName": "MadMachine",
 	"description": "MadMachine for Visual Studio Code",
 	"icon": "images/logo.png",
-	"version": "0.0.2",
+	"version": "0.0.3",
 	"homepage": "https://madmachine.io",
 	"license": "MIT",
 	"repository": {
@@ -87,6 +87,6 @@
 		"@vscode/test-electron": "^1.6.2"
 	},
 	"extensionPack": [
-		"hancel.serialport-helper"
+		"ms-vscode.vscode-serial-monitor"
 	]
 }

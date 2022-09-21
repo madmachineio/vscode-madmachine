@@ -8,7 +8,7 @@ import * as cp from "child_process";
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
-	if (!checkSdkVersion('0.5.0')) {
+	if (!checkSdkVersion('0.7.0')) {
 		vscode.window.showErrorMessage('Please update the MadMachine SDK');
 		throw vscode.CancellationError;
 	}
