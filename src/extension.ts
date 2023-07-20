@@ -8,6 +8,7 @@ import * as cp from "child_process";
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
+	console.log('activating...');
 	if (!checkSdkVersion('0.7.0')) {
 		vscode.window.showErrorMessage('Please update the MadMachine SDK');
 		throw vscode.CancellationError;
@@ -42,7 +43,7 @@ export function activate(context: vscode.ExtensionContext) {
 			throw vscode.CancellationError;
 		}
 
-		var boardName: string
+		var boardName: string;
 		if (projectType == 'executable') {
 			boardName = await boardPick();
 			console.log(boardName);
@@ -70,7 +71,7 @@ export function activate(context: vscode.ExtensionContext) {
 				}
 				cp.execSync('mkdir ' + projectPath);
 
-				var newCommand: string
+				var newCommand: string;
 				if (projectType == 'executable') {
 					newCommand = ('cd ' + projectPath + '; ' +
 					cmd + ' -b ' + boardName + ' -t ' + projectType);
@@ -137,25 +138,23 @@ function checkSdkVersion(support: string): boolean {
 	const cmd = sdkPath + '/usr/mm/mm --version';
 
 	const current = cp.execSync(cmd).toString().trim();
-	console.log(current);
 
 	const supportVersion = support.split('.');
 	const currentVersion = current.split('.');
 	const count = supportVersion.length;
 
-	console.log(supportVersion);
-	console.log(currentVersion);
-	console.log(count);
+	console.log('Support sdk version: ' + String(supportVersion));
+	console.log('Current sdk version: ' + String(currentVersion));
 
 	for (let i = 0; i < count; i++) {
 		let currenNum = Number(currentVersion[i]);
 		let supportNum = Number(supportVersion[i]);
 
-		if ((i === 0 || i === 1) && currenNum !== supportNum) {
+		if ((i === 0) && currenNum !== supportNum) {
 			return false;
 		}
 
-		if (i === 2 && currenNum < supportNum) {
+		if (currenNum < supportNum) {
 			return false;
 		}
 	}
