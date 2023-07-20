@@ -64,7 +64,7 @@ This extension contributes the following settings:
 
 
 
-### 0.0.3
+### 0.0.4
 
 Initial commit
 Compatible with MadMachine SDK 0.7.0 or newer
