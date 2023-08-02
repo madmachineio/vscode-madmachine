@@ -186,7 +186,7 @@ async function projectTypePick() {
 }
 
 async function boardPick() {
-	const result = await vscode.window.showQuickPick(['SwiftIOFeather', 'SwiftIOBoard'], {
+	const result = await vscode.window.showQuickPick(['SwiftIOMicro', 'SwiftIOBoard'], {
 		placeHolder: 'Choose the board, you could change it in the Packae.mmp later',
 	});
     return <string>result;
