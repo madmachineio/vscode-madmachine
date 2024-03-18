@@ -68,3 +68,8 @@ This extension contributes the following settings:
 
 Initial commit
 Compatible with MadMachine SDK 0.7.0 or newer
+
+### 0.0.6
+
+* Add a 'Copy' button to enable resource downloads to the Flash or SD card filesystem
+* Compatible with MadMachine SDK 0.9.3 or newer

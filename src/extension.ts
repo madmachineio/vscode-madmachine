@@ -2,6 +2,7 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import * as fs from 'fs';
+import * as path from 'path';
 import * as cp from "child_process";
 
 
@@ -9,7 +10,7 @@ import * as cp from "child_process";
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
 	console.log('activating...');
-	if (!checkSdkVersion('0.7.0')) {
+	if (!checkSdkVersion('0.9.3')) {
 		vscode.window.showErrorMessage('Please update the MadMachine SDK');
 		throw vscode.CancellationError;
 	}
@@ -32,31 +33,81 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 	context.subscriptions.push(downloadCommand);
 
+
+
+
+	let copyCommand = vscode.commands.registerCommand('madmachine.copy', async () => {
+		console.log('madmachine copy');
+
+		const resourcePath = path.join(getRootPath(), './Resources');
+		if (!fs.existsSync(resourcePath)) {
+			vscode.window.showErrorMessage('This project does not include a Resources directory!');
+			throw vscode.FileSystemError.FileNotFound();
+		}
+		console.log(resourcePath);
+
+		const hasFile = containsFilesRecursiveSync(resourcePath);
+		if (!hasFile) {
+			vscode.window.showErrorMessage('No files exist in the Resources directory!');
+			throw vscode.FileSystemError.FileNotFound();
+		}
+
+		const sdkPath = getSdkPath();
+		var cmd = sdkPath + '/usr/mm/mm copy';
+
+		var copyMode = await copyModePick();
+		if (!copyMode) {
+			throw vscode.CancellationError;
+		}
+		console.log(copyMode);
+		
+		copyMode = copyMode.toLowerCase();
+		if (copyMode.includes('merge')) {
+			cmd += ' -m merge';
+		} else if (copyMode.includes('sync')) {
+			cmd += ' -m sync';
+		} else {
+			throw vscode.CancellationError;
+		}
+
+		if (copyMode.includes('lfs')) {
+			cmd += ' -d /lfs';
+		} else if (copyMode.includes('sd')) {
+			cmd += ' -d /SD:';
+		} else {
+			throw vscode.CancellationError;
+		}
+
+		console.log(cmd);
+		terminalExec(cmd);
+	});
+	context.subscriptions.push(copyCommand);
+
 	let newCommand = vscode.commands.registerCommand('madmachine.new', async () => {
 		console.log('madmachine new project');
 		const sdkPath = getSdkPath();
 		const cmd = sdkPath + '/usr/mm/mm init';
 
 		const projectType = await projectTypePick();
-		console.log(projectType);
 		if (!projectType) {
 			throw vscode.CancellationError;
 		}
+		console.log(projectType);
 
 		var boardName: string;
-		if (projectType == 'executable') {
+		if (projectType === 'executable') {
 			boardName = await boardPick();
-			console.log(boardName);
 			if (!boardName) {
 				throw vscode.CancellationError;
 			}
+			console.log(boardName);
 		}
 
 		const projectName = await projectNameInput();
-		console.log(projectName);
 		if (!projectName) {
 			throw vscode.CancellationError;
 		}
+		console.log(projectName);
 
 		vscode.window.showOpenDialog({
 			canSelectFiles: false,
@@ -72,7 +123,7 @@ export function activate(context: vscode.ExtensionContext) {
 				cp.execSync('mkdir ' + projectPath);
 
 				var newCommand: string;
-				if (projectType == 'executable') {
+				if (projectType === 'executable') {
 					newCommand = ('cd ' + projectPath + '; ' +
 					cmd + ' -b ' + boardName + ' -t ' + projectType);
 				} else {
@@ -177,17 +228,27 @@ function getRootPath(): string {
 	return rootPath;
 }
 
+async function copyModePick() {
+	const result = await vscode.window.showQuickPick(['Sync Resources to /lfs',
+														'Merge Resources to /lfs',
+														'Sync Resources to /SD:',
+														'Merge Resources to /SD:'], {
+		placeHolder: 'Select the copy mode and destination',
+	});
+    return <string>result;
+}
+
 
 async function projectTypePick() {
 	const result = await vscode.window.showQuickPick(['executable', 'library'], {
-		placeHolder: 'Choose the project type',
+		placeHolder: 'Select the project type',
 	});
     return <string>result;
 }
 
 async function boardPick() {
 	const result = await vscode.window.showQuickPick(['SwiftIOMicro', 'SwiftIOBoard'], {
-		placeHolder: 'Choose the board, you could change it in the Packae.mmp later',
+		placeHolder: 'Select the board, you can change it later in the Package.mmp file',
 	});
     return <string>result;
 }
@@ -202,3 +263,30 @@ async function projectNameInput() {
 
 	return result;
 }
+
+/**
+ * Recursively checks whether the specified path and all its subdirectories contain any files.
+ * @param folderPath The path of the folder to check.
+ * @returns boolean Returns true if any file is found in the path or its subdirectories, otherwise false.
+ */
+const containsFilesRecursiveSync = (folderPath: string): boolean => {
+	// Read the directory contents synchronously, including details of the entries
+	const items = fs.readdirSync(folderPath, { withFileTypes: true });
+  
+	for (const item of items) {
+	  if (item.isFile()) {
+		// If an item is a file, return true immediately
+		return true;
+	  } else if (item.isDirectory()) {
+		// If an item is a directory, recursively call this function
+		const foundInSubdir = containsFilesRecursiveSync(path.join(folderPath, item.name));
+		if (foundInSubdir) {
+		  // If a file is found in a subdirectory, return true immediately
+		  return true;
+		}
+	  }
+	}
+  
+	// After checking all items and subdirectories, if no file is found, return false
+	return false;
+  };
