@@ -10,8 +10,11 @@ import * as cp from "child_process";
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
 	console.log('activating...');
-	if (!checkSdkVersion('0.9.3')) {
-		vscode.window.showErrorMessage('Please update the MadMachine SDK');
+
+	const supportedVersion = '0.9.3';
+
+	if (!checkSdkVersion(supportedVersion)) {
+		vscode.window.showErrorMessage('Please update the MadMachine SDK to ' + supportedVersion + ' or newer');
 		throw vscode.CancellationError;
 	}
 
@@ -179,13 +182,15 @@ function getSdkPath(): string {
 
 	const sdkUri = vscode.Uri.parse(sdkPath);
 	if (sdkPath === '') {
-		const errorMessage = 'Please configure the path for the mm-sdk in the VS Code settings';
+		const errorMessage = 'Please configure the path for the MadMachine SDK in the VS Code settings';
+		vscode.window.showErrorMessage(errorMessage);
 		throw vscode.FileSystemError.FileNotFound(errorMessage);
 	}
 
 	const mmUri = vscode.Uri.parse(sdkPath + '/usr/mm/mm');
 	if (!fs.existsSync(sdkUri.fsPath) || !fs.existsSync(mmUri.fsPath)) {
-		const errorMessage = 'Please ensure you specify the correct path for the mm-SDK in the VS Code settings';
+		const errorMessage = 'Please ensure you specify the correct path for the MadMachine SDK in the VS Code settings';
+		vscode.window.showErrorMessage(errorMessage);
 		throw vscode.FileSystemError.FileNotFound(errorMessage);
 	}
 

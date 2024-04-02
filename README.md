@@ -77,3 +77,8 @@ Compatible with MadMachine SDK 0.7.0 or newer
 ### 0.0.7
 
 * Add warning information if the SDK path setting is incorrect 
+
+
+### 0.0.9
+
+* Update the warning information 
