@@ -73,3 +73,7 @@ Compatible with MadMachine SDK 0.7.0 or newer
 
 * Add a 'Copy' button to enable resource downloads to the Flash or SD card filesystem
 * Compatible with MadMachine SDK 0.9.3 or newer
+
+### 0.0.7
+
+* Add warning information if the SDK path setting is incorrect 

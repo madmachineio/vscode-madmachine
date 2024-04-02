@@ -172,15 +172,23 @@ function getSdkPath(): string {
 	} else if (platform === 'linux') {
 		sdkPath = workspaceSettings.sdk.linux;
 	} else {
-		vscode.window.showErrorMessage('Only support macOS and Linux currently');
+		vscode.window.showErrorMessage('We currently support only macOS and Linux');
 		throw vscode.CancellationError;
 	}
+	console.log('sdk path setting: ' + sdkPath);
 
 	const sdkUri = vscode.Uri.parse(sdkPath);
-	if (sdkPath === ''  || !fs.existsSync(sdkUri.fsPath)) {
-		const errorMessage = 'Please specify the correct MadMachine SDK path in the VSCode settings';
-		throw vscode.FileSystemError.FileNotADirectory(errorMessage);
+	if (sdkPath === '') {
+		const errorMessage = 'Please configure the path for the mm-sdk in the VS Code settings';
+		throw vscode.FileSystemError.FileNotFound(errorMessage);
 	}
+
+	const mmUri = vscode.Uri.parse(sdkPath + '/usr/mm/mm');
+	if (!fs.existsSync(sdkUri.fsPath) || !fs.existsSync(mmUri.fsPath)) {
+		const errorMessage = 'Please ensure you specify the correct path for the mm-SDK in the VS Code settings';
+		throw vscode.FileSystemError.FileNotFound(errorMessage);
+	}
+
 	return sdkUri.fsPath;
 }
 
