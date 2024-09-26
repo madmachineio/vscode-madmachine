@@ -82,3 +82,8 @@ Compatible with MadMachine SDK 0.7.0 or newer
 ### 0.0.9
 
 * Update the warning information 
+
+
+### 1.1.0
+
+* Update for official embedded swift

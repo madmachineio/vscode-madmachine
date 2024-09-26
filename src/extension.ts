@@ -214,11 +214,12 @@ function checkSdkVersion(support: string): boolean {
 		let currenNum = Number(currentVersion[i]);
 		let supportNum = Number(supportVersion[i]);
 
-		if ((i === 0) && currenNum !== supportNum) {
-			return false;
-		}
+		// if ((i === 0) && currenNum !== supportNum) {
+		// 	return false;
+		// }
 
 		if (currenNum < supportNum) {
+			console.log('false support %d, current: %d', supportNum, currenNum);
 			return false;
 		}
 	}
