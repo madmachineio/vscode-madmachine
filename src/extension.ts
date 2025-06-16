@@ -12,17 +12,92 @@ export function activate(context: vscode.ExtensionContext) {
 	console.log('activating...');
 
 	const supportedVersion = '0.9.3';
+	const suggestedVersion = '2.0.0';
 
-	if (!checkSdkVersion(supportedVersion)) {
+	const currentVersion = getCurrentSdkVersion();
+
+	if (!checkSdkVersion(currentVersion, supportedVersion)) {
 		vscode.window.showErrorMessage('Please update the MadMachine SDK to ' + supportedVersion + ' or newer');
 		throw vscode.CancellationError;
 	}
+
+	let newCommand = vscode.commands.registerCommand('madmachine.new', async () => {
+		console.log('madmachine new project');
+		const sdkPath = getSdkPath();
+		const toolchainPath = getToolchainPath();
+
+		var cmd = sdkPath + '/usr/mm/mm init';
+		if (checkSdkVersion(currentVersion, suggestedVersion)) {
+			if (fs.existsSync(toolchainPath)) {
+				cmd += ' --toolchain ' + toolchainPath;
+			}
+		}
+
+		const projectType = await projectTypePick();
+		if (!projectType) {
+			throw vscode.CancellationError;
+		}
+		console.log(projectType);
+
+		var boardName: string;
+		if (projectType === 'executable') {
+			boardName = await boardPick();
+			if (!boardName) {
+				throw vscode.CancellationError;
+			}
+			console.log(boardName);
+		}
+
+		const projectName = await projectNameInput();
+		if (!projectName) {
+			throw vscode.CancellationError;
+		}
+		console.log(projectName);
+
+		vscode.window.showOpenDialog({
+			canSelectFiles: false,
+			canSelectFolders: true
+		}).then( uris => {
+			if (uris) {
+				const projectPath = vscode.Uri.joinPath(uris[0], projectName).fsPath;
+				console.log(projectPath);
+				if (fs.existsSync(projectPath)) {
+					vscode.window.showErrorMessage(projectPath + ' already exists');
+					throw vscode.FileSystemError.FileExists(projectPath);
+				}
+				cp.execSync('mkdir ' + projectPath);
+
+				var newCommand: string;
+				if (projectType === 'executable') {
+					newCommand = ('cd ' + projectPath + '; ' +
+					cmd + ' -b ' + boardName + ' -t ' + projectType);
+				} else {
+					newCommand = ('cd ' + projectPath + '; ' +
+					cmd + ' -t ' + projectType);
+				}
+
+				cp.execSync(newCommand);
+
+				vscode.commands.executeCommand('vscode.openFolder', vscode.Uri.parse(projectPath), true);
+			}
+		});
+	});
+	context.subscriptions.push(newCommand);
 
 	let buildCommand = vscode.commands.registerCommand('madmachine.build', async () => {
 		console.log('madmachine build');
 		vscode.workspace.saveAll();
 		const sdkPath = getSdkPath();
-		const cmd = sdkPath + '/usr/mm/mm build';
+		const toolchainPath = getToolchainPath();
+
+		var cmd = sdkPath + '/usr/mm/mm build';
+
+		if (checkSdkVersion(currentVersion, suggestedVersion)) {
+			if (fs.existsSync(toolchainPath)) {
+				cmd += ' --toolchain ' + toolchainPath;
+			}
+		}
+
 		terminalExec(cmd);
 	});
 	context.subscriptions.push(buildCommand);
@@ -85,62 +160,6 @@ export function activate(context: vscode.ExtensionContext) {
 		terminalExec(cmd);
 	});
 	context.subscriptions.push(copyCommand);
-
-	let newCommand = vscode.commands.registerCommand('madmachine.new', async () => {
-		console.log('madmachine new project');
-		const sdkPath = getSdkPath();
-		const cmd = sdkPath + '/usr/mm/mm init';
-
-		const projectType = await projectTypePick();
-		if (!projectType) {
-			throw vscode.CancellationError;
-		}
-		console.log(projectType);
-
-		var boardName: string;
-		if (projectType === 'executable') {
-			boardName = await boardPick();
-			if (!boardName) {
-				throw vscode.CancellationError;
-			}
-			console.log(boardName);
-		}
-
-		const projectName = await projectNameInput();
-		if (!projectName) {
-			throw vscode.CancellationError;
-		}
-		console.log(projectName);
-
-		vscode.window.showOpenDialog({
-			canSelectFiles: false,
-			canSelectFolders: true
-		}).then( uris => {
-			if (uris) {
-				const projectPath = vscode.Uri.joinPath(uris[0], projectName).fsPath;
-				console.log(projectPath);
-				if (fs.existsSync(projectPath)) {
-					vscode.window.showErrorMessage(projectPath + ' already exists');
-					throw vscode.FileSystemError.FileExists(projectPath);
-				}
-				cp.execSync('mkdir ' + projectPath);
-
-				var newCommand: string;
-				if (projectType === 'executable') {
-					newCommand = ('cd ' + projectPath + '; ' +
-					cmd + ' -b ' + boardName + ' -t ' + projectType);
-				} else {
-					newCommand = ('cd ' + projectPath + '; ' +
-					cmd + ' -t ' + projectType);
-				}
-
-				cp.execSync(newCommand);
-
-				vscode.commands.executeCommand('vscode.openFolder', vscode.Uri.parse(projectPath), true);
-			}
-		});
-	});
-	context.subscriptions.push(newCommand);
 }
 
 // this method is called when your extension is deactivated
@@ -174,22 +193,24 @@ function getSdkPath(): string {
 		sdkPath = workspaceSettings.sdk.mac;
 	} else if (platform === 'linux') {
 		sdkPath = workspaceSettings.sdk.linux;
+	} else if (platform === 'win32') {
+		sdkPath = workspaceSettings.sdk.windows;
 	} else {
-		vscode.window.showErrorMessage('We currently support only macOS and Linux');
+		vscode.window.showErrorMessage('Unsupported platform: ' + platform);
 		throw vscode.CancellationError;
 	}
 	console.log('sdk path setting: ' + sdkPath);
 
 	const sdkUri = vscode.Uri.parse(sdkPath);
 	if (sdkPath === '') {
-		const errorMessage = 'Please configure the path for the MadMachine SDK in the VS Code settings';
+		const errorMessage = 'Please set the MadMachine SDK path in the VS Code settings';
 		vscode.window.showErrorMessage(errorMessage);
 		throw vscode.FileSystemError.FileNotFound(errorMessage);
 	}
 
 	const mmUri = vscode.Uri.parse(sdkPath + '/usr/mm/mm');
 	if (!fs.existsSync(sdkUri.fsPath) || !fs.existsSync(mmUri.fsPath)) {
-		const errorMessage = 'Please ensure you specify the correct path for the MadMachine SDK in the VS Code settings';
+		const errorMessage = 'Please ensure that the correct path to the MadMachine SDK is configured in your VS Code settings';
 		vscode.window.showErrorMessage(errorMessage);
 		throw vscode.FileSystemError.FileNotFound(errorMessage);
 	}
@@ -197,18 +218,47 @@ function getSdkPath(): string {
 	return sdkUri.fsPath;
 }
 
-function checkSdkVersion(support: string): boolean {
+function getToolchainPath(): string {
+	const platform = process.platform;
+	const workspaceSettings = vscode.workspace.getConfiguration('madmachine');
+	let toolchainPath: string = '';
+
+	if (platform === 'darwin')	{
+		toolchainPath = workspaceSettings.toolchain.mac;
+	} else if (platform === 'linux') {
+		toolchainPath = workspaceSettings.toolchain.linux;
+	} else if (platform === 'win32') {
+		toolchainPath = workspaceSettings.toolchain.windows;
+	}
+
+	console.log('Swift toolchain path setting: ' + toolchainPath);
+
+	const toolchainUri = vscode.Uri.parse(toolchainPath);
+	if (!fs.existsSync(toolchainUri.fsPath)) {
+		const warningMessage = 'Swift toolchain path is not set in the VS Code settings, trying to use the default one';
+		vscode.window.showWarningMessage(warningMessage);
+	}
+
+	return toolchainUri.fsPath;
+}
+
+function getCurrentSdkVersion(): string {
 	const sdkPath = getSdkPath();
 	const cmd = sdkPath + '/usr/mm/mm --version';
 
 	const current = cp.execSync(cmd).toString().trim();
 
-	const supportVersion = support.split('.');
+	return current;
+}
+
+function checkSdkVersion(current: string, support: string): boolean {
+
 	const currentVersion = current.split('.');
+	const supportVersion = support.split('.');
 	const count = supportVersion.length;
 
-	console.log('Support sdk version: ' + String(supportVersion));
 	console.log('Current sdk version: ' + String(currentVersion));
+	console.log('Support sdk version: ' + String(supportVersion));
 
 	for (let i = 0; i < count; i++) {
 		let currenNum = Number(currentVersion[i]);

@@ -3,7 +3,7 @@
   "displayName": "MadMachine",
   "description": "MadMachine for Visual Studio Code",
   "icon": "images/logo.png",
-  "version": "1.1.1",
+  "version": "2.0.0",
   "homepage": "https://madmachine.io",
   "license": "MIT",
   "repository": {
@@ -12,7 +12,7 @@
   },
   "publisher": "MadMachine",
   "engines": {
-    "vscode": "^1.90.0"
+    "vscode": "^1.96.0"
   },
   "categories": [
     "Other"
@@ -27,11 +27,34 @@
 			"properties": {
 				"madmachine.sdk.mac": {
 					"type": "string",
-					"description": "Specify the MadMachine SDK path on macOS"
+					"description": "Set the MadMachine SDK path on macOS",
+					"order": 1
+				},
+				"madmachine.toolchain.mac": {
+					"type": "string",
+					"description": "Set the Swift toolchain path on macOS (optional)",
+					"default": "/Library/Developer/Toolchains/swift-latest.xctoolchain",
+					"order": 2
 				},
 				"madmachine.sdk.linux": {
 					"type": "string",
-					"description": "Specify the MadMachine SDK path on Linux"
+					"description": "Set the MadMachine SDK path on Linux",
+					"order": 3
+				},
+				"madmachine.toolchain.linux": {
+					"type": "string",
+					"description": "Set the Swift toolchain path on Linux (optional)",
+					"order": 4
+				},
+				"madmachine.sdk.windows": {
+					"type": "string",
+					"description": "Set the MadMachine SDK path on Windows",
+					"order": 5
+				},
+				"madmachine.toolchain.windows": {
+					"type": "string",
+					"description": "Set the Swift toolchain path on Windows (optional)",
+					"order": 6
 				}
 			}
 		},

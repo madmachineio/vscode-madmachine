@@ -30,7 +30,7 @@ The extension relies on the mm sdk to do all its work. So you need to indicate i
 
 ![Set the MadMachine extension](./images/settings.png)
 
-3. In the Settings, select **Extensions** / **MadMachine**. **Enter the path of the sdk** in the box that matches your operating system. Windows is not supported since we are waiting for the good Window support of Swift language...
+3. In the Settings, select **Extensions** / **MadMachine**. **Enter the path to the sdk and Swift toolchain (optional)** in the box that matches your operating system.
 
 ![Indicate the path of sdk.](./images/sdkPath.png)
 
@@ -42,6 +42,7 @@ The extension is at the bottom of the Explore panel. All you need for your proje
 
 - **Build**: build your project after you finish the code. If there are any errors, you can modify your code according to the message in the terminal. 
 - **Download**: download the generated bin file to your board after building your project.
+- **Copy Resources**: copy the entire `Resources` directory to the specified file system (Flash: `/lfs` or SD card: `/SD:`)
 - **New Project**: create a new MadMachine project. You will decide the project type and the board type. Go [here](https://docs.madmachine.io/overview/getting-started/create-project) to learn how you can create a new project.
 
 ![MadMachine extension](./images/extension.png)
@@ -54,36 +55,12 @@ Welcome to our [docs](https://docs.madmachine.io/) for more info and get started
 This extension contributes the following settings:
 
 * `madmachine.sdk.mac`: The MadMachine SDK path on macOS
+* `madmachine.toolchain.mac`: The Swift toolchain path on macOS
+
 * `madmachine.sdk.linux`: The MadMachine SDK path on Linux
+* `madmachine.toolchain.linux`: The Swift toolchain path on Linux
+
+* `madmachine.sdk.windows`: The MadMachine SDK path on Windows
+* `madmachine.toolchain.windows`: The Swift toolchain path on Windows
 
 ## Known Issues
-
-
-
-## Release Notes
-
-
-
-### 0.0.4
-
-Initial commit
-Compatible with MadMachine SDK 0.7.0 or newer
-
-### 0.0.6
-
-* Add a 'Copy' button to enable resource downloads to the Flash or SD card filesystem
-* Compatible with MadMachine SDK 0.9.3 or newer
-
-### 0.0.7
-
-* Add warning information if the SDK path setting is incorrect 
-
-
-### 0.0.9
-
-* Update the warning information 
-
-
-### 1.1.0
-
-* Update for official embedded swift
