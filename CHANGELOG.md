@@ -5,10 +5,12 @@
 Initial commit
 Compatible with MadMachine SDK 0.7.0 or newer
 
+
 ## [0.0.6]
 
 * Add a 'Copy' button to enable resource downloads to the Flash or SD card filesystem
 * Compatible with MadMachine SDK 0.9.3 or newer
+
 
 ## [0.0.7]
 
@@ -24,7 +26,14 @@ Compatible with MadMachine SDK 0.7.0 or newer
 
 * Update for official embedded swift
 
+
 ## [2.0.0]
 
 * Add support for Windows
 * Add setting for specifying a custom Swift toolchain path (optional)
+
+
+# [2.1.0]
+
+* activation async and handle SDK version detection failures with clearer errors
+* Validate SDK/toolchain paths more robustly
